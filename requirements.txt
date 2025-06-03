@@ -1,0 +1,4 @@
+Flask
+yt-dlp
+unidecode
+PyQt5
