@@ -26,9 +26,14 @@ def sanitize_filename(title):
     return sanitized
 
 def get_video_info(url, cookies_path=None):
+    # Always use www.youtube.com_cookies.txt as default if exists
+    default_cookies_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'www.youtube.com_cookies.txt')
+    if not cookies_path and os.path.exists(default_cookies_path):
+        cookies_path = default_cookies_path
+    print(f"[DEBUG] get_video_info: cookies_path = {cookies_path}")
     ydl_opts = {
         'quiet': True,
-        'ffmpeg_location': r'C:\Program Files\ffmpeg-master-latest-win64-gpl-shared\bin',  # ระบุ path ffmpeg ให้ตรงกับที่ติดตั้ง
+        'ffmpeg_location': r'C:\Program Files\ffmpeg-master-latest-win64-gpl-shared\bin',
     }
     if cookies_path:
         ydl_opts['cookiefile'] = cookies_path
@@ -50,6 +55,11 @@ def download_video(url, fmt, resolution, cookies_path=None, custom_filename=None
     import json
     import os
     from unidecode import unidecode
+    # Always use www.youtube.com_cookies.txt as default if exists
+    default_cookies_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'www.youtube.com_cookies.txt')
+    if not cookies_path and os.path.exists(default_cookies_path):
+        cookies_path = default_cookies_path
+    print(f"[DEBUG] download_video: cookies_path = {cookies_path}")
     with tempfile.TemporaryDirectory() as tmpdir:
         if custom_filename:
             safe_name = sanitize_filename(custom_filename)[:80]
@@ -196,6 +206,7 @@ def fetch_info():
         cookies_path = tmp.name
     try:
         search_url = url if url.startswith('http') else f"ytsearch1:{url}"
+        print(f"[DEBUG] /fetch_info: cookies_path = {cookies_path}")
         title, thumbnail, resolutions = get_video_info(search_url, cookies_path)
         filename = sanitize_filename(title)
         return jsonify({
@@ -222,6 +233,7 @@ def download():
     try:
         search_url = url if url.startswith('http') else f"ytsearch1:{url}"
         resolution = int(res) if res and res.isdigit() else None
+        print(f"[DEBUG] /download: cookies_path = {cookies_path}")
         # ดึง title จริงจาก get_video_info
         title, _, _ = get_video_info(search_url, cookies_path)
         print(f"[DEBUG] download: url={search_url}, fmt={fmt}, res={resolution}, cookies_path={cookies_path}, title={title}, output_dir={output_dir}")
