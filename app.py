@@ -27,7 +27,7 @@ def sanitize_filename(title):
 
 def get_video_info(url, cookies_path=None):
     # Always use www.youtube.com_cookies.txt as default if exists
-    default_cookies_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '/www.youtube.com_cookies.txt')
+    default_cookies_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'www.youtube.com_cookies.txt')
     if not cookies_path and os.path.exists(default_cookies_path):
         cookies_path = default_cookies_path
     print(f"[DEBUG] get_video_info: cookies_path = {cookies_path}")
