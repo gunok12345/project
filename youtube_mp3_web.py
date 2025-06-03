@@ -68,7 +68,15 @@ def main():
     lang = st.radio("Language / ภาษา", ["English", "ไทย"], horizontal=True)
     is_th = lang == "ไทย"
     url = st.text_input("YouTube Link or Video Name" if not is_th else "ลิงก์ YouTube หรือชื่อวิดีโอ")
+    # --- set default cookies path ---
+    default_cookies_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'www.youtube.com_cookies.txt')
+    default_cookies_file = None
+    if os.path.exists(default_cookies_path):
+        default_cookies_file = default_cookies_path
     cookies_file = st.file_uploader("cookies.txt (optional)" if not is_th else "cookies.txt (ถ้ามี)", type=["txt"])
+    # แสดง path default (ถ้ามี) ใต้ uploader
+    if not cookies_file and default_cookies_file:
+        st.info(("Using default cookies: " if not is_th else "ใช้ cookies เริ่มต้น: ") + default_cookies_file)
     fetch_btn = st.button("Fetch Info" if not is_th else "ดึงข้อมูลวิดีโอ")
     video_info = None
     if fetch_btn and url:
@@ -78,6 +86,8 @@ def main():
                 with tempfile.NamedTemporaryFile(delete=False, suffix='.txt') as tmp:
                     tmp.write(cookies_file.read())
                     cookies_path = tmp.name
+            elif default_cookies_file:
+                cookies_path = default_cookies_file
             try:
                 search_url = url if url.startswith('http') else f"ytsearch1:{url}"
                 title, thumbnail, resolutions = get_video_info(search_url, cookies_path)
@@ -108,6 +118,8 @@ def main():
                         with tempfile.NamedTemporaryFile(delete=False, suffix='.txt') as tmp:
                             tmp.write(cookies_file.read())
                             cookies_path = tmp.name
+                    elif default_cookies_file:
+                        cookies_path = default_cookies_file
                     try:
                         search_url = url if url.startswith('http') else f"ytsearch1:{url}"
                         out_path = download_video(search_url, selected_fmt, selected_res, cookies_path)

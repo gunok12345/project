@@ -64,7 +64,18 @@ function fetchInfo() {
     fetch('/fetch_info', { method: 'POST', body: formData })
         .then(r => r.json())
         .then(data => {
-            if (data.error) { alert(data.error); return; }
+            if (data.error) {
+                if (/cookies|sign in|authentication|bot/i.test(data.error)) {
+                    alert((lang==='en'?
+                        'This video requires authentication. Please export cookies.txt from your browser (while logged in to YouTube) and upload it before downloading. How to: https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp'
+                        :
+                        'วิดีโอนี้ต้องใช้ cookies.txt กรุณา export cookies จาก browser ที่ล็อกอิน YouTube แล้วแนบไฟล์นี้ก่อนดาวน์โหลด วิธีทำ: https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp'
+                    ));
+                } else {
+                    alert(data.error);
+                }
+                return;
+            }
             document.getElementById('videoInfo').style.display = '';
             document.getElementById('videoTitle').innerText = (lang==='en'?'Video Title: ':'ชื่อวิดีโอ: ') + data.title;
             document.getElementById('filename').innerText = (lang==='en'?'File name: ':'ชื่อไฟล์: ') + data.filename;
@@ -117,7 +128,7 @@ function downloadVideo() {
         method: 'POST',
         body: formData
     }).then(response => {
-        if (!response.ok) throw new Error('Download failed');
+        if (!response.ok) return response.text().then(msg => { throw new Error(msg); });
         // ดึงชื่อไฟล์จาก header
         let disposition = response.headers.get('Content-Disposition');
         let filename = 'download.mp3';
@@ -140,7 +151,15 @@ function downloadVideo() {
         a.click();
         setTimeout(()=>{progress.style.display='none';}, 1000);
     }).catch(e => {
-        alert(e);
+        if (/cookies|sign in|authentication|bot/i.test(e.message)) {
+            alert((lang==='en'?
+                'This video requires authentication. Please export cookies.txt from your browser (while logged in to YouTube) and upload it before downloading. How to: https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp'
+                :
+                'วิดีโอนี้ต้องใช้ cookies.txt กรุณา export cookies จาก browser ที่ล็อกอิน YouTube แล้วแนบไฟล์นี้ก่อนดาวน์โหลด วิธีทำ: https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp'
+            ));
+        } else {
+            alert(e);
+        }
         progress.style.display = 'none';
     });
 }

@@ -412,6 +412,10 @@ class DownloaderUI(QWidget):
         self.cookies_input = QLineEdit()
         self.cookies_input.setMinimumHeight(60)
         self.cookies_input.setMinimumWidth(800)
+        # --- set default cookies path ---
+        default_cookies = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'www.youtube.com_cookies.txt')
+        if os.path.exists(default_cookies):
+            self.cookies_input.setText(default_cookies)
         self.cookies_btn = QPushButton()
         self.cookies_btn.setMinimumHeight(60)
         self.cookies_btn.setMinimumWidth(180)
